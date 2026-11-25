@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Numerics · Place Value Toolkit for Chuyan v15</title>
+<title>Numerics · PVTK v19</title>
 <style>
   :root{
     --navy:#1F3A5F; --green:#355E3B; --putty:#E6DCC8; --taupe:#D8CFC4; --silver:#B9BDC2;
@@ -644,7 +644,6 @@
 
   /* the four choices are made on Home; each screen shows only what it needs */
   #guide.steps .gstep.gskip{display:none}
-  #guide.strip .gi.lpline{display:none}
   #guide .gsum{flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:16px;color:var(--navy);padding:2px 0 4px}
   #guide .gsum .gsl{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:#6b7380}
   #guide .gsum .gsv{font-weight:700}
@@ -665,6 +664,20 @@
   #drawer .dbody select,#drawer .dbody input{font-size:15px!important}
   #drawer .dbody .seg button{font-size:14px!important}
   #drawer .dfoot{background:#fff;font-size:14px!important}
+
+  #guide .gsum{gap:10px 18px!important}
+  #guide .gsum .gsg{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+  #guide .gsum .gst{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#6b7380}
+  #guide .gsum select{max-width:260px;font-size:14px}
+  #guide.strip .gsum .gsl{display:none}
+
+  #guide .gsum select.lp,#guide .gsum select{width:auto!important;max-width:250px!important;flex:none!important}
+  #guide .gsum .gsg{flex-wrap:nowrap!important;flex-direction:row!important}
+  #guide .gsum .gsl{display:none!important}
+  #guide.steps .gsum{max-width:1300px;margin:0 auto}
+
+  header.top .brand b::after,#intro .ihead b::after{display:none!important;content:none!important}
+  .wl-brand span{display:none!important}
 </style>
 <!-- Numerics copy guard: blocks right-click, image dragging, text selection outside fields, and save/view-source/dev-tools shortcuts -->
 <style id="nx-guard-css">
@@ -2842,14 +2855,14 @@ function buildTopicSet(){
 }
 function renderTopicSheets(){
   if(!W.probs || W.ptag!==tTag()){ buildTopicSet(); return; }
-  const per=+S.wPer, cols=per===2?1:2, rows=per/cols, total=W.probs.length, pages=Math.ceil(total/per);
+  const per=+S.wPer, cols=(per===2||S.topic==='cmp')?1:2, rows=per/cols, total=W.probs.length, pages=Math.ceil(total/per);   // v18: compare problems get the full page width
   const fs= per===2?32: per===4?26:21, lab= per===2?11: per===4?9.5:8.5;
   const cellW=(8.5-1)*96/cols, cellH=((11-1)*96-.72*96)/rows, picW=cellW-40;
   let u=32, fsC=fs, labC=lab;
   if(S.topic==='cmp'){
     const idx=W.probs.map((p,i)=>i).filter(i=>modeFor(i,total)!=='A');
     if(idx.length){
-      const f=cmpFit(idx.map(i=>W.probs[i]),k=>repFor(idx[k]),fs,cellW-24,(q,f2)=>Math.max(40,cellH-overheadT(f2,f2*lab/fs,q,'C')-18),32);
+      const f=cmpFit(idx.map(i=>W.probs[i]),k=>repFor(idx[k]),fs,cellW-24,(q,f2)=>Math.max(40,cellH-f2*(S.cmpDiff?5.1:3.8)-14),60);
       u=f.u; fsC=f.fs; labC=lab*f.fs/fs;
     }
   } else W.probs.forEach((p,i)=>{ if(modeFor(i,total)!=='C' || (p.kind==='as'&&p.strat==='ten') || (p.kind==='npt'&&p.lvl==='1000')) return; const m=svgInner(topicPic(p,repFor(i),10)); const ph=Math.max(40,cellH-overheadT(fs,lab,p,'C')-18); u=Math.min(u,10*picW/m.w,10*ph/m.h); });
@@ -4631,7 +4644,7 @@ function pvPairPic(a,b,L){ const rep=pvRep(); const one=v=>cfit(u=>buildD(rep,d3
   return '<div class="tpair"><div><div class="tpn">'+a+'</div>'+one(a)+'</div><div><div class="tpn">'+b+'</div>'+one(b)+'</div></div>'; }
 
 
-/* ---------- Make And Break A Ten (Chuyan edition v15) ---------- */
+/* ---------- Make And Break A Ten (PVTK v15) ---------- */
 function tfPic(red,yel,cross){ const u=96,g=8; let o='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(5*u+2*g)+' '+(2*u+2*g)+'" width="'+(5*u+2*g)+'" height="'+(2*u+2*g)+'">';
   for(let r=0;r<2;r++) for(let c=0;c<5;c++){ const i=r*5+c, x=g+c*u, y=g+r*u; o+='<rect x="'+x+'" y="'+y+'" width="'+u+'" height="'+u+'" fill="#fff" stroke="#1F3A5F" stroke-width="4"/>';
     let f=null; if(i<red) f='#D64541'; else if(i<red+yel) f='#F2C230'; if(f){ o+='<circle cx="'+(x+u/2)+'" cy="'+(y+u/2)+'" r="'+(u*.36)+'" fill="'+f+'"/>';
@@ -5107,7 +5120,7 @@ document.addEventListener('contextmenu',function(e){var t=e.target;if(t&&t.close
     render();
   })();
 
-  /* ================= Chuyan edition: welcome page ================= */
+  /* ================= PVTK: welcome page ================= */
   (function(){
     var W=mk('div','',''); W.id='welcome';
     var comps=[
@@ -5121,7 +5134,7 @@ document.addEventListener('contextmenu',function(e){var t=e.target;if(t&&t.close
       ['Three names for every number','The counting name tells us how many. The numeral tells us the structure. The structure name tells us how the number is built.'],
       ['Concrete, pictorial, symbolic','Each place value skill, from building and naming numbers to comparing them, can be taught with materials, with pictures and models, and with numerals and equations.'],
       ['Explicit, then practice','Nothing is asked before it has been taught. Examples, non-examples and learning errors belong in practice.']];
-    W.innerHTML='<div class="wl-hero"><div class="wl-in"><div class="wl-brand">Numerics<span></span></div><div class="wl-kick">Place Value Toolkit</div><div class="wl-btns"><button type="button" class="wl-go" id="wlGo">Open The Toolkit ▶</button><button type="button" class="wl-ghost" id="wlLesson">Watch A Model Lesson</button><button type="button" class="wl-ghost" id="wlHow">How It Works (video)</button></div></div></div>'+
+    W.innerHTML='<div class="wl-hero"><div class="wl-in"><div class="wl-brand">Numerics<span></span></div><div class="wl-kick">Place Value Toolkit</div><div class="wl-btns"><button type="button" class="wl-go" id="wlGo">Open The Toolkit ▶</button><button type="button" class="wl-ghost" id="wlLesson">Watch A Model Lesson</button><button type="button" class="wl-ghost" id="wlHow">How It Works Video</button></div></div></div>'+
       '<div class="wl-sec"><h2>Design principles</h2><div class="wl-prin">'+prin.map(function(p){return '<div><b>'+p[0]+'</b><span>'+p[1]+'</span></div>'}).join('')+'</div></div>'+
       '<div class="wl-sec wl-what"><h2>What the toolkit makes</h2><div class="wl-prin"><div><b>Lesson Presentation</b><span>Step-by-step explicit lessons, downloadable as PowerPoint.</span></div><div><b>Practice Presentation</b><span>Board practice: question first, answer revealed.</span></div><div><b>Practice Pages</b><span>Printable pages with keys.</span></div><div><b>Center Activities</b><span>Task cards, Sort, Path &amp; Memory, Build-It mats, recording sheets.</span></div></div></div>'+
       '<div class="wl-foot">Numerics by Laurie Bloomfield · Structured Numeracy</div>';
@@ -5143,7 +5156,8 @@ document.addEventListener('contextmenu',function(e){var t=e.target;if(t&&t.close
     $('homeBtn').addEventListener('click',function(){ show(); });
     if($('tchHome')) $('tchHome').addEventListener('click',function(){ show(); });
     var oldGo=go; go=function(j){ oldGo(j); addSum(); };
-    function addSum(){ var g=$('guide'); if(!g) return; var old=g.querySelector('.gsum'); if(old) old.remove(); var d=mk('div','gsum','<span class="gsl">Your Choices</span><span class="gsv">'+(window.__wzSum?window.__wzSum():'')+'</span>'); var b=mk('button','btn ghost','◀ Back'); b.type='button'; b.onclick=function(){ goHome(); }; d.appendChild(b); g.insertBefore(d,g.firstChild); tidyBoard(g); [].forEach.call(g.querySelectorAll('.gstep'),function(st){ var n=st.querySelector('.gn'); st.classList.toggle('gskip',!!n && n.textContent!=='5'); }); }
+    function addSum(){ var g=$('guide'); if(!g) return; if(g.querySelector('.gsum')) return; var d=mk('div','gsum','<span class="gsl">Your Choices</span>');
+      [].forEach.call(g.querySelectorAll('.gstep'),function(st){ var n=st.querySelector('.gn'), gc=st.querySelector('.gc'); if(!n||n.textContent==='5'||!gc) return; var grp=mk('span','gsg','<span class="gst">'+st.querySelector('.gt').textContent.replace(/^\d+/,'')+'</span>'); while(gc.firstChild) grp.appendChild(gc.firstChild); d.appendChild(grp); }); var b=mk('button','btn ghost','◀ Back'); b.type='button'; b.onclick=function(){ goHome(); }; d.appendChild(b); g.insertBefore(d,g.firstChild); tidyBoard(g); [].forEach.call(g.querySelectorAll('.gstep'),function(st){ var n=st.querySelector('.gn'); st.classList.toggle('gskip',!!n && n.textContent!=='5'); }); }
     document.querySelectorAll('.tab').forEach(function(t){ t.addEventListener('click',function(){ setTimeout(addSum,0); }); });
     var ih=intro.querySelector('.ihead'); var ib=mk('button','ihow','⌂ Home'); ib.type='button'; ib.style.marginLeft='0'; ib.onclick=show; ih.appendChild(ib);
     show();
